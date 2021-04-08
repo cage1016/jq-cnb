@@ -1,0 +1,32 @@
+api = "0.5"
+
+[buildpack]
+id = "cage1016/jq-cnb"
+name = "jq cloud native buildpack"
+version = "1.0.0"
+homepage = "https://github.com/cage1016/jq-cnb"
+description = "This buildpack include jq"
+keywords = ["jq", "cnb"]
+
+[metadata]
+[[metadata.dependencies]]
+uri = "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64"
+
+
+[[buildpack.licenses]]
+type = "MIT"
+
+[[stacks]]
+id = "google"
+
+[[stacks]]
+id = "io.buildpacks.stacks.bionic"
+
+[[stacks]]
+id = "io.buildpacks.samples.stacks.bionic"
+
+[[stacks]]
+id = "heroku-18"
+
+[[stacks]]
+id = "heroku-20"
