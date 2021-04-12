@@ -1,15 +1,19 @@
 package jq
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"text/template"
 
 	"github.com/BurntSushi/toml"
 	"github.com/cloudfoundry/packit"
 )
+
+const default_version = "1.6"
 
 func Build() packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
@@ -30,7 +34,16 @@ func Build() packit.BuildFunc {
 			return packit.BuildResult{}, err
 		}
 
-		uri := m.Metadata.Dependencies[0].URI
+		tmp := template.Must(template.New("v").Parse(m.Metadata.Dependencies[0].URI))
+		ret := bytes.NewBufferString("")
+		input := map[string]string{"Version": default_version}
+
+		entry := context.Plan.Entries[0]
+		if _, ok := entry.Metadata["jq-version"]; ok {
+			input["Version"] = entry.Metadata["jq-version"].(string)
+		}
+		_ = tmp.Execute(ret, input)
+		uri := ret.String()
 		fmt.Printf("URI -> %s\n", uri)
 
 		jq, err := context.Layers.Get("jq", packit.LaunchLayer)
@@ -68,6 +81,10 @@ func Build() packit.BuildFunc {
 		err = ioutil.WriteFile(filepath.Join(dir, "jq"), data, 0777)
 		if err != nil {
 			return packit.BuildResult{}, err
+		}
+
+		jq.Metadata = map[string]interface{}{
+			"jq-version": input["Version"],
 		}
 
 		return packit.BuildResult{

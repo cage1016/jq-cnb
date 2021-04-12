@@ -11,6 +11,8 @@ https://registry.buildpacks.io/buildpacks/cage1016/jq-cnb
 
 ## Usage
 
+you could assign specific jq version by `echo 1.5 > .jq-version` at build time
+
 ```
 pack build myapp --buildpack cage1016/jq-cnb@1.0.0
 ```
